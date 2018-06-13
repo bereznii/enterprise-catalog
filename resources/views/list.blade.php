@@ -2,7 +2,7 @@
 @section('content')
         <div class="panel panel-default" >
         <div class="panel-heading">
-        <form action="/list/order/none" method="post">
+        <form action="/list/none" method="post">
             {{ csrf_field() }}
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Search" value='' name="search_request">
@@ -10,59 +10,20 @@
                     <button class="btn btn-default" type="submit" name="do_search">
                         <i class="glyphicon glyphicon-search"></i>
                     </button>
-                    <a href="/list" class="btn btn-default" title="Очистить Поиск">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                    </a>
                 </div>
             </div>
         </form>
         </div>
-        <div class="panel-body">
+        <div class="panel-body" id="employee_table">
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>#
-                        <a href="/list/order/id&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/list/order/id&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>ФИО
-                        <a href="/list/order/name&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/list/order/name&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Должность
-                        <a href="/list/order/position&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/list/order/position&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Дата​ ​приема​ ​на​ ​работу
-                        <a href="/list/order/hired_at&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/list/order/hired_at&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Размер​ ​заработной​ ​платы
-                        <a href="/list/order/salary&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/list/order/salary&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Фото
-                    </th>
+                    <th><a href="#" class="column_sort" id="id" data-order="desc">#</a></th>
+                    <th><a href="#" class="column_sort" id="name" data-order="desc">ФИО</th>
+                    <th><a href="#" class="column_sort" id="position" data-order="desc">Должность</th>
+                    <th><a href="#" class="column_sort" id="hired_at" data-order="desc">Дата​ ​приема​ ​на​ ​работу</th>
+                    <th><a href="#" class="column_sort" id="salary" data-order="desc">Размер​ ​заработной​ ​платы</th>
+                    <th>Фото</th>
                 </tr>
             </thead>
             <tbody>
@@ -82,14 +43,10 @@
                     </td>
                 </tr>
             @endforeach
-                <tr>
-                    <td colspan="5">...</td>
-                </tr>
-            </tbody>
         </table>
         </div>
         </div>
-
+        
         <script src="{{ asset('js/lightbox.min.js') }}"></script>
         <script>
             lightbox.option({
@@ -98,5 +55,25 @@
             'fadeDuration': 200,
             'wrapAround': true
             })
+        </script>
+        <script>
+            $(document).ready(function() {
+                $(document).on('click', '.column_sort', function() {
+                    var column_name = $(this).attr("id");
+                    var order = $(this).data("order");
+                    var arrow = '';
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url:"/order",
+                        method:"POST",
+                        data:{column_name:column_name, order:order},
+                        success: function(data) {
+                            $('#employee_table').html(data);
+                        }
+                    })
+                });
+            });
         </script>
 @endsection

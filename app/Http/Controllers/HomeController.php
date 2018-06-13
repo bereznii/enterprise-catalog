@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\Worker;
 
 class HomeController extends Controller
 {
@@ -26,7 +27,9 @@ class HomeController extends Controller
 
         if(view()->exists('home')) {
 
-            $workers = DB::select("SELECT * FROM workers LIMIT 100");
+            $request->session()->forget('search_request');
+
+            $workers = Worker::limit(100)->get();
 
             return view('home')->withTitle('List')->with('workers', $workers);
         }
@@ -34,72 +37,118 @@ class HomeController extends Controller
         abort(404);
     }
 
-    public function refresh(Request $request) {
+    public function search(Request $request) {
 
         if(view()->exists('home')) {
 
-            $request->session()->forget('search');
+            $search_request = $request->input('search_request');
+            $request->session()->put('search_request', $search_request);
+            
+            $workers = Worker::where('id', 'LIKE', "%".$search_request."%")
+                                            ->orwhere(function ($query) use ($search_request) {
+                                                $query->where('name', 'LIKE', "%".$search_request."%")
+                                                        ->orWhere('position', 'LIKE', "%".$search_request."%")
+                                                        ->orWhereRaw("DATE_FORMAT(hired_at, '%Y-%m-%d') LIKE '%".$search_request."%'")
+                                                        ->orWhere('salary', 'LIKE', "%".$search_request."%");
+                                            })
+                                            ->limit(100)
+                                            ->get();
 
-            return redirect()->route('home');
+            return view('home')->withTitle('Home')->with('workers', $workers);
         }
 
         abort(404);
     }
 
-    public function order($info, Request $request) {
+    public function order_ajax(Request $request) {
 
-        if(view()->exists('home')) {
-
-            $columnArr = ['id', 'name', 'position', 'hired_at', 'salary'];
-
-            $workers = false;
-            if(!$request->input('search_request')){
-                $search = '';
-                if($request->session()->get('search')) {
-                    $search = "LIKE '%" . $request->session()->get('search') ."%'";
-                }
-            } else {
-                $request->session()->put('search', $request->input('search_request'));
-                $search = $request->input('search_request');
-                $search = "LIKE '%" . $search ."%'";
-            }
-            if($info == 'none') {
-                $string = '';
-            } else {
-                $string = explode("&", $info);
-                $string = "ORDER BY " . $string[0] . " " . $string[1];
-            }
-
-            
-
-            $i = 0;
-            while(!$workers) {
-                $workers = DB::select("SELECT * FROM workers 
-                                                WHERE " . $columnArr[$i] . 
-                                                " $search " . 
-                                                $string .
-                                                " LIMIT 100");
-                $i++;
-                if($i > 4) {
-                    $workers = false;
-                    break;
-                }
-            }
-            
-            return view('home')->withTitle('List')->with('workers', $workers);
+        $order = $request->input('order');
+        $column_name = $request->input('column_name');
+        
+        $output = '';
+        
+        if($order == 'desc') {
+            $order = 'asc';
+        } else {
+            $order = 'desc';
         }
 
-        abort(404);
+        if($request->session()->get('search_request')) {
+            $search_request = $request->session()->get('search_request');
+        } else {
+            $search_request = '';
+        }
+        
+        $workers = Worker::where('id', 'LIKE', "%".$search_request."%")
+                                        ->orwhere(function ($query) use ($search_request) {
+                                            $query->where('name', 'LIKE', "%".$search_request."%")
+                                                    ->orWhere('position', 'LIKE', "%".$search_request."%")
+                                                    ->orWhereRaw("DATE_FORMAT(hired_at, '%Y-%m-%d') LIKE '%".$search_request."%'")
+                                                    ->orWhere('salary', 'LIKE', "%".$search_request."%");
+                                        })
+                                        ->orderBy($column_name, $order)
+                                        ->limit(100)
+                                        ->get();
+        
+        $output .= '
+                    <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th><a href="#" class="column_sort" id="id" data-order='.$order.'>#</a></th>
+                            <th><a href="#" class="column_sort" id="name" data-order='.$order.'>ФИО</th>
+                            <th><a href="#" class="column_sort" id="position" data-order='.$order.'>Должность</th>
+                            <th><a href="#" class="column_sort" id="hired_at" data-order='.$order.'>Дата​ ​приема​ ​на​ ​работу</th>
+                            <th><a href="#" class="column_sort" id="salary" data-order='.$order.'>Размер​ ​заработной​ ​платы</th>
+                            <th colspan="3">
+                                <a href="/home/create" class="btn btn-primary btn-xs">
+                                    <span class="glyphicon glyphicon-plus"></span>Добавить 
+                                </a>
+                            </th>
+                        </tr>
+                    </thead><tbody>';
+        foreach($workers as $worker) {
+    
+        $output .= '
+                    <tr>
+                        <td>'.$worker->id.'</td>
+                        <td>'.$worker->name.'</td>
+                        <td>'.$worker->position.'</td>
+                        <td>'.$worker->hired_at.'</td>
+                        <td>'.$worker->salary.'</td>
+                        <td>
+                        <a href="/home/read/'.$worker->id.'" title="Информация">
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                        </a>
+                        </td><td>
+                        <a href="/home/update/'.$worker->id.'" title="Изменить">
+                            <span class="glyphicon glyphicon-pencil"></span>
+                        </a>
+                        </td>
+                    <td>
+                        <a href="#demo'.$worker->id.'" data-toggle="collapse" title="Удалить">
+                            <span class="glyphicon glyphicon-remove"></span>
+                        </a>
+                    </td>
+                </tr>
+                <tr id="demo'.$worker->id.'" class="collapse">
+                    <td colspan="5"></td>
+                    <td colspan="3" align="center">Удалить?   <a class="btn btn-default btn-xs" href="/home/delete/'.$worker->id.'">Да</a></td>
+                </tr>';
+        }
+        
+        echo $output;
+
+    
     }
 
     public function read($user_id) {
 
         if(view()->exists('userinfo')) {
 
-            $worker = DB::select('SELECT * FROM workers WHERE id = :id', ['id' => $user_id]);
-
-            $supervisor = DB::select('SELECT * FROM workers WHERE id = :id', ['id' => $worker[0]->supervisor]);
-
+            $worker = Worker::find($user_id);
+            
+            $supervisor = Worker::find($worker['supervisor']);
+            
             return view('userinfo')->withTitle('Information')->with('worker', $worker)->with('supervisor', $supervisor);
         }
 
@@ -110,12 +159,14 @@ class HomeController extends Controller
 
         if(view()->exists('home')) {
 
-            DB::delete('DELETE FROM workers WHERE id = :id', ['id' => $user_id]);
+            $worker = Worker::find($user_id);
+            $worker->delete();
 
-            $items = DB::select('SELECT * FROM workers WHERE supervisor = :supervisor', ['supervisor' => $user_id]);
-
+            $items = Worker::where('supervisor', '=', $user_id)->get();
+            
             foreach($items as $item) {
-                DB::update('UPDATE workers SET supervisor = NULL WHERE supervisor = :supervisor', ['supervisor' => $user_id]);
+                $item->supervisor = NULL;
+                $item->save();
             }
 
             return redirect()->route('home');
@@ -130,25 +181,25 @@ class HomeController extends Controller
 
             $positionArr = ['President', 'Second Management Level', 'Third Management Level', 'Fourth Management Level', 'Fifth Management Level', 'Worker'];
 
-            $worker = DB::select('SELECT * FROM workers WHERE id = :id', ['id' => $user_id]); //работник, чьи данные требуется
-            $supervisor = DB::select('SELECT * FROM workers WHERE id = :id', ['id' => $worker[0]->supervisor]);//данные о руководителе работника
+            $worker = Worker::find($user_id);//работник, чьи данные требуется
+            $supervisor = Worker::find($worker->supervisor);//данные о руководителе работника
             
-            if($worker[0]->supervisor) {
+            if($worker->supervisor) {
                 if(!$supervisor) {
-                    $accessible_supervisor_position = $positionArr[array_search($worker[0]->position, $positionArr) - 1];
+                    $accessible_supervisor_position = $positionArr[array_search($worker->position, $positionArr) - 1];
                 } else {
-                    $accessible_supervisor_position = $positionArr[array_search($supervisor[0]->position, $positionArr)];//название позиции руководителя
+                    $accessible_supervisor_position = $positionArr[array_search($supervisor->position, $positionArr)];//название позиции руководителя
                 }
-                $supervisor_list = DB::select('SELECT * FROM workers WHERE position = :position', ['position' => $accessible_supervisor_position]);
+                $supervisor_list = Worker::where('position', '=', $accessible_supervisor_position)->get();
                 
-            } else if($worker[0]->supervisor == NULL) {
-                $accessible_supervisor_position = $positionArr[array_search($worker[0]->position, $positionArr) - 1];
-                $supervisor_list = DB::select('SELECT * FROM workers WHERE position = :position', ['position' => $accessible_supervisor_position]);
+            } else if($worker->supervisor == NULL) {
+                $accessible_supervisor_position = $positionArr[array_search($worker->position, $positionArr) - 1];
+                $supervisor_list = Worker::where('position', '=', $accessible_supervisor_position)->get();
               
             } else {
                 $supervisor_list = NULL;
             }
-            //dump($worker);
+            
             return view('userupdate')->withTitle('Update')->with('worker', $worker)
                                                         ->with('supervisor', $supervisor)
                                                         ->with('positions', $positionArr)
@@ -164,12 +215,6 @@ class HomeController extends Controller
 
             $worker = $request->all();
 
-            //$worker['user_id']
-            //$worker['new_name']
-            //$worker['new_position']
-            //$worker['new_supervisor']
-            //$worker['new_salary']
-            //$worker['new_photo']
             if($worker['new_supervisor'] == 'NULL') {
                 $worker['new_supervisor'] = 0;
             }
@@ -179,13 +224,14 @@ class HomeController extends Controller
             $photo_name = explode('.', $request->file('new_photo')->getClientOriginalName());
             $photo_name = $worker['user_id'] . '.' . $photo_name[1];
             
-            DB::update("UPDATE workers SET name = '" . $worker['new_name'] . 
-                                        "', position = '" . $worker['new_position'] . 
-                                        "', supervisor = '"  . $worker['new_supervisor'] .
-                                        "', salary = '" . $worker['new_salary'] .
-                                        "', hired_at = '" . $worker['new_date'] .
-                                        "', photo = '" . $photo_name .
-                                        "' WHERE id = ?", [$worker['user_id']]);
+            $updated_worker = Worker::find($worker['user_id']);
+            $updated_worker->name = $worker['new_name'];
+            $updated_worker->position = $worker['new_position'];
+            $updated_worker->supervisor = $worker['new_supervisor'];
+            $updated_worker->salary = $worker['new_salary'];
+            $updated_worker->photo = $photo_name;
+            $updated_worker->hired_at = $worker['new_date'];
+            $updated_worker->save();
 
             $request->file('new_photo')->storeAs('public', $photo_name);
 
@@ -200,8 +246,8 @@ class HomeController extends Controller
 
         if(view()->exists('usercreate')) {
 
-            $last_id = DB::select('SELECT id FROM workers ORDER BY id DESC LIMIT 1');
-            $id = $last_id[0]->id + 1;
+            $last_worker = Worker::orderBy('id','desc')->limit(1)->get();
+            $id = $last_worker[0]['id'] + 1;
             
             $positions = ['President', 'Second Management Level', 'Third Management Level', 'Fourth Management Level', 'Fifth Management Level', 'Worker'];
             $accessible_supervisors = false;
@@ -220,10 +266,6 @@ class HomeController extends Controller
         if(view()->exists('userinfo')) {
 
             $new_worker = $request->all();
-            
-            $last_id = DB::select('SELECT id FROM workers ORDER BY id DESC LIMIT 1');
-            $id = $last_id[0]->id;
-
             if($request->file('new_photo')) {
                 $name = $request->file('new_photo')->getClientOriginalName();
 
@@ -234,18 +276,18 @@ class HomeController extends Controller
                 $photo_name = NULL;
             }
 
-            DB::insert('INSERT INTO workers (name, position, supervisor, hired_at, salary, photo) 
-                        VALUES (?, ?, ?, ?, ?, ?)', 
-                        [
-                            $new_worker['new_name'], 
-                            $new_worker['new_position'], 
-                            $new_worker['new_supervisor'], 
-                            $new_worker['new_date'], 
-                            $new_worker['new_salary'],
-                            $photo_name
-                        ]);
+            $worker = new Worker;
+            $worker->name = $new_worker['new_name'];
+            $worker->position = $new_worker['new_position'];
+            $worker->supervisor = $new_worker['new_supervisor'];
+            $worker->hired_at = $new_worker['new_date'];
+            $worker->salary = $new_worker['new_salary'];
+            $worker->photo = $photo_name;
+            $worker->save();
 
-            $id++;
+            $last_worker = Worker::orderBy('id','desc')->limit(1)->get();
+            $id = $last_worker[0]['id'];
+
             return redirect()->action('HomeController@read', ['user_id' => $id]);
         }
 
@@ -257,9 +299,9 @@ class HomeController extends Controller
             $positions = ['President', 'Second Management Level', 'Third Management Level', 'Fourth Management Level', 'Fifth Management Level', 'Worker'];
             $response_supervisors = '';
             
-            if($positions[array_search($request->input('ccId'), $positions)] != 'President') {
+            if($positions[array_search($request->input('pos'), $positions)] != 'President') {
                 
-                $accessible_supervisors = $positions[array_search($request->input('ccId'), $positions) - 1];
+                $accessible_supervisors = $positions[array_search($request->input('pos'), $positions) - 1];
                 $accessible_supervisors = DB::select('SELECT id, name, position FROM workers WHERE position = :position', ['position' => $accessible_supervisors]);
                 
                 foreach($accessible_supervisors as $supervisor) {

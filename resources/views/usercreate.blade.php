@@ -7,7 +7,7 @@
                     <h4>Добавить Сотрудника # {{$id}}</h4>
                 </div>
                 <div class="panel-body">
-                    <form action="/home/do_create" method="post" enctype="multipart/form-data">
+                    <form action="/do_create" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
                 <table class="table table-hover">
                     <thead>
@@ -66,7 +66,26 @@
                 </div>
             </div>
         </div>
-    <script src="{{ asset('js/user_supervisor.js') }}"></script>
+    <script>
+            $(document).ready(function() {
+            $('#sel1').change(function() {
+                var sel1_id = $(this).val();
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "/createajax",
+                    method: "POST",
+                    data: {pos:sel1_id},
+                    dataType: "text",
+                    success: function(data) {
+                        $('#sel2').html(data);
+                        console.log('success!');
+                    }
+                });
+            });
+        });
+    </script>
     </body>
 </html>
 @endsection

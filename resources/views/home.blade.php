@@ -1,11 +1,8 @@
 @extends('layouts.app')
-
 @section('content')
-
-<div class="main-section">
         <div class="panel panel-default" >
         <div class="panel-heading">
-        <form action="/home/order/none" method="post">
+        <form action="/home/none" method="post">
             {{ csrf_field() }}
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Search" value='' name="search_request">
@@ -13,58 +10,19 @@
                     <button class="btn btn-default" type="submit" name="do_search">
                         <i class="glyphicon glyphicon-search"></i>
                     </button>
-                    <a href="/home/refresh" class="btn btn-default" title="Очистить Поиск">
-                        <span class="glyphicon glyphicon-refresh"></span>
-                    </a>
                 </div>
             </div>
         </form>
         </div>
-        <div class="panel-body">
-        @if($workers)
+        <div class="panel-body" id="employee_table">
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>#
-                        <a href="/home/order/id&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/home/order/id&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>ФИО
-                        <a href="/home/order/name&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/home/order/name&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Должность
-                        <a href="/home/order/position&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/home/order/position&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Дата​ ​приема​ ​на​ ​работу
-                        <a href="/home/order/hired_at&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/home/order/hired_at&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
-                    <th>Размер​ ​заработной​ ​платы
-                        <a href="/home/order/salary&DESC">
-                            <span class="glyphicon glyphicon-arrow-down"></span>
-                        </a>
-                        <a href="/home/order/salary&ASC">
-                            <span class="glyphicon glyphicon-arrow-up"></span>
-                        </a>
-                    </th>
+                    <th><a href="#" class="column_sort" id="id" data-order="desc">#</a></th>
+                    <th><a href="#" class="column_sort" id="name" data-order="desc">ФИО</th>
+                    <th><a href="#" class="column_sort" id="position" data-order="desc">Должность</th>
+                    <th><a href="#" class="column_sort" id="hired_at" data-order="desc">Дата​ ​приема​ ​на​ ​работу</th>
+                    <th><a href="#" class="column_sort" id="salary" data-order="desc">Размер​ ​заработной​ ​платы</th>
                     <th colspan="3">
                         <a href="/home/create" class="btn btn-primary btn-xs">
                             <span class="glyphicon glyphicon-plus"></span>Добавить 
@@ -100,36 +58,26 @@
                     <td colspan="3" align="center">Удалить?   <a class="btn btn-default btn-xs" href="/home/delete/{{$worker->id}}">Да</a></td>
                 </tr>
             @endforeach
-                <tr>
-                    <td colspan="8">...</td>
-                </tr>
-            </tbody>
         </table>
-        @else 
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>ФИО</th>
-                    <th>Должность</th>
-                    <th>Дата​ ​приема​ ​на​ ​работу</th>
-                    <th>Размер​ ​заработной​ ​платы</th>
-                    <th colspan="3">
-                        <a href="/home/create" class="btn btn-primary btn-xs">
-                            <span class="glyphicon glyphicon-plus"></span>Добавить 
-                        </a>
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td colspan="8" align="center">Ничего не найдено</td>
-                </tr>
-            </tbody>
-        </table>
-        @endif
         </div>
         </div>
-        </div>
-
+        <script>
+            $(document).ready(function() {
+                $(document).on('click', '.column_sort', function() {
+                    var column_name = $(this).attr("id");
+                    var order = $(this).data("order");
+                    $.ajax({
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        url:"/home",
+                        method:"POST",
+                        data:{column_name:column_name, order:order},
+                        success: function(data) {
+                            $('#employee_table').html(data);
+                        }
+                    })
+                });
+            });
+        </script>
 @endsection

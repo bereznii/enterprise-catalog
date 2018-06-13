@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use App\Worker;
 
 class TreeController extends Controller
 {
@@ -11,8 +12,8 @@ class TreeController extends Controller
 
         if(view()->exists('tree')) {
             
-            $president = DB::select("SELECT id, name, position, hired_at, salary FROM workers WHERE position = 'President'");
-            $second_ml_workers = DB::select("SELECT id, name, position, hired_at, salary FROM workers WHERE position = 'Second Management Level' LIMIT 10");
+            $president = Worker::where('position', '=', 'President')->get();
+            $second_ml_workers =  Worker::where('position', '=', 'Second Management Level')->get();
 
             $requested_list = explode('&', $id);
             
@@ -26,21 +27,21 @@ class TreeController extends Controller
             if($id != 'none') {
 
                 if(end($requested_list) > 2) {
-                    $supervisor[0] = DB::select("SELECT id, name FROM workers WHERE id = " . $requested_list[0]);
-                    $third_ml_workers = DB::select("SELECT id, name, position, hired_at, salary FROM workers WHERE position = 'Third Management Level' AND supervisor = " . $requested_list[0]);
+                    $supervisor[0] = Worker::find($requested_list[0]);
+                    $third_ml_workers =  Worker::where('position', '=', 'Third Management Level')->where('supervisor', '=', $requested_list[0])->get();
                     
                     if(end($requested_list) > 3) {
-                        $supervisor[1] =  DB::select("SELECT id, name FROM workers WHERE id = " . $requested_list[1]);
-                        $fourth_ml_workers = DB::select("SELECT id, name, position, hired_at, salary FROM workers WHERE position = 'Fourth Management Level' AND supervisor = " . $requested_list[1]);
-                    
+                        $supervisor[1] = Worker::find($requested_list[1]);
+                        $fourth_ml_workers =  Worker::where('position', '=', 'Fourth Management Level')->where('supervisor', '=', $requested_list[1])->get();
+                        
                         if(end($requested_list) > 4) {
-                            $supervisor[2] =  DB::select("SELECT id, name FROM workers WHERE id = " . $requested_list[2]);
-                            $fifth_ml_workers = DB::select("SELECT id, name, position, hired_at, salary FROM workers WHERE position = 'Fifth Management Level' AND supervisor = " . $requested_list[2]);
-                            
+                            $supervisor[2] = Worker::find($requested_list[2]);
+                            $fifth_ml_workers =  Worker::where('position', '=', 'Fifth Management Level')->where('supervisor', '=', $requested_list[2])->get();
+
                             if(end($requested_list) > 5) {
-                                $supervisor[3] =  DB::select("SELECT id, name FROM workers WHERE id = " . $requested_list[3]);
-                                $sixth_ml_workers = DB::select("SELECT id, name, position, hired_at, salary FROM workers WHERE position = 'Worker' AND supervisor = " . $requested_list[3]);
-                            
+                                $supervisor[3] = Worker::find($requested_list[3]);
+                                $sixth_ml_workers =  Worker::where('position', '=', 'Worker')->where('supervisor', '=', $requested_list[3])->get();
+
                             }
                         }
                     }

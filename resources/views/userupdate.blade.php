@@ -4,12 +4,12 @@
         <div class="main-section">
             <div class="panel panel-default" >
                 <div class="panel-heading">
-                    Информация о сотруднике # {{$worker[0]->id}}
+                    Информация о сотруднике # {{$worker->id}}
                 </div>
                 <div class="panel-body">
-                    <form action="/home/do_update" method="post" enctype="multipart/form-data">
+                    <form action="/do_update" method="post" enctype="multipart/form-data">
                     {{ csrf_field() }}
-                    <input type="hidden" name="user_id" value="{{$worker[0]->id}}">
+                    <input type="hidden" name="user_id" value="{{$worker->id}}">
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -21,18 +21,18 @@
                     <tbody>
                         <tr>
                             <td>#</td>
-                            <td>{{$worker[0]->id}}</td>
+                            <td>{{$worker->id}}</td>
                         </tr>
                         <tr>
                             <td>ФИО</td>
-                            <td><input class="form-control" type="text" placeholder="" value="{{$worker[0]->name}}" name="new_name" required></td>
+                            <td><input class="form-control" type="text" placeholder="" value="{{$worker->name}}" name="new_name" required></td>
                         </tr>
                         <tr>
                             <td>Должность</td>
                             <td>
                                 <select class="form-control"  name="new_position" id="sel1">
                                     @foreach($positions as $position)
-                                        @if($position == $worker[0]->position)
+                                        @if($position == $worker->position)
                                             <option selected="selected" value="{{$position}}">{{$position}}</option>
                                         @else
                                         <option value="{{$position}}">{{$position}}</option>
@@ -45,21 +45,28 @@
                             <td>Руководитель</td>
                             <td>
                                 <select class="form-control" name="new_supervisor" id="sel2">
+                                    @foreach($supervisor_list as $supervisor)
+                                         @if($supervisor->id == $worker->supervisor)
+                                            <option selected="selected" value="{{$supervisor->id}}">{{$supervisor->name}}, {{$supervisor->id}}, {{$supervisor->position}}</option>
+                                        @else
+                                            <option value="{{$supervisor->id}}">{{$supervisor->name}}, {{$supervisor->id}}, {{$supervisor->position}}</option>
+                                        @endif
+                                    @endforeach
                                 </select>
                                 
                             </td>
                         </tr>
                         <tr>
                             <td>Дата приема на работу</td>
-                            <td><input class="form-control" type="date" value="{{$worker[0]->hired_at}}" name="new_date"></td>
+                            <td><input class="form-control" type="date" value="{{$worker->hired_at}}" name="new_date"></td>
                         </tr>
                         <tr>
                             <td>Размер заработной платы</td>
-                            <td><input class="form-control" type="text" placeholder="" value="{{$worker[0]->salary}}" name="new_salary" required></td>
+                            <td><input class="form-control" type="text" placeholder="" value="{{$worker->salary}}" name="new_salary" required></td>
                         </tr>
                         <tr>
                             <td>Фотография сотрудника</td>
-                            <td><img src="{{asset('storage/') . '/' . $worker[0]->photo}}" alt="Фото отсутствует" style="max-width:200px; max-height:200px;">
+                            <td><img src="{{asset('storage/') . '/' . $worker->photo}}" alt="Фото отсутствует" style="max-width:200px; max-height:200px;">
                                 <hr>
                                 <input type="file" class="form-control-file" name="new_photo">
                             </td>
@@ -75,7 +82,26 @@
                 </div>
             </div>
         </div>
-        <script src="{{ asset('js/user_supervisor.js') }}"></script>
+        <script>
+            $(document).ready(function() {
+            $('#sel1').change(function() {
+                var sel1_id = $(this).val();
+                $.ajax({
+                    headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "/createajax",
+                    method: "POST",
+                    data: {pos:sel1_id},
+                    dataType: "text",
+                    success: function(data) {
+                        $('#sel2').html(data);
+                        console.log('success!');
+                    }
+                });
+            });
+        });
+    </script>
     </body>
 </html>
 @endsection

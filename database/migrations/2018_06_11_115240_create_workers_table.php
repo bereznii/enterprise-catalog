@@ -19,6 +19,7 @@ class CreateWorkersTable extends Migration {
 			$table->string('position');
 			$table->string('supervisor')->nullable();
 			$table->date('hired_at')->default('2018-06-11');
+			$table->timestamps();
 			$table->integer('salary');
 			$table->string('photo')->nullable();
 		});

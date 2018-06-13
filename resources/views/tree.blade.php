@@ -15,7 +15,7 @@
                         <tbody>
                         @foreach($president as $head)
                             <tr>
-                                <td>{{$head->id}}</td>
+                                <td>{{$head['id']}}</td>
                                 <td>{{$head->name}}</td>
                                 <td>{{$head->position}}</td>
                                 <td>{{$head->hired_at}}</td>
@@ -52,7 +52,7 @@
                     @if($thirdworkers)
                         <li class="list-group-item">
                             <ul class="list-group">
-                                <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[0][0]->name}} | Third Management Level</p>
+                                <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[0]['name']}} | Third Management Level</p>
                                 <table class="table table-hover">
                                     <thead>
                                         <tr>
@@ -67,7 +67,7 @@
                                     @foreach($thirdworkers as $worker)
                                         <tr>
                                             <td>{{$worker->id}}</td>
-                                            <td><a href="/tree/{{$supervisor[0][0]->id}}&{{$worker->id}}&4">{{$worker->name}}</a></td>
+                                            <td><a href="/tree/{{$supervisor[0]['id']}}&{{$worker->id}}&4">{{$worker->name}}</a></td>
                                             <td>{{$worker->position}}</td>
                                             <td>{{$worker->hired_at}}</td>
                                             <td>{{$worker->salary}}</td>
@@ -78,7 +78,7 @@
                                     @if($fourthworkers)
                                     <li class="list-group-item">
                                         <ul class="list-group">
-                                            <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[1][0]->name}} | Fourth Management Level</p>
+                                            <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[1]['name']}} | Fourth Management Level</p>
                                             <table class="table table-hover">
                                                 <thead>
                                                     <tr>
@@ -93,7 +93,7 @@
                                                 @foreach($fourthworkers as $worker)
                                                     <tr>
                                                         <td>{{$worker->id}}</td>
-                                                        <td><a href="/tree/{{$supervisor[0][0]->id}}&{{$supervisor[1][0]->id}}&{{$worker->id}}&5">{{$worker->name}}</a></td>
+                                                        <td><a href="/tree/{{$supervisor[0]['id']}}&{{$supervisor[1]['id']}}&{{$worker->id}}&5">{{$worker->name}}</a></td>
                                                         <td>{{$worker->position}}</td>
                                                         <td>{{$worker->hired_at}}</td>
                                                         <td>{{$worker->salary}}</td>
@@ -104,7 +104,7 @@
                                                 @if($fifthworkers)
                                                 <li class="list-group-item">
                                                     <ul class="list-group">
-                                                        <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[2][0]->name}} | Fifth Management Level</p>
+                                                        <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[2]['name']}} | Fifth Management Level</p>
                                                         <table class="table table-hover">
                                                             <thead>
                                                                 <tr>
@@ -119,7 +119,7 @@
                                                             @foreach($fifthworkers as $worker)
                                                                 <tr>
                                                                     <td>{{$worker->id}}</td>
-                                                                    <td><a href="/tree/{{$supervisor[0][0]->id}}&{{$supervisor[1][0]->id}}&{{$supervisor[2][0]->id}}&{{$worker->id}}&6">{{$worker->name}}</a></td>
+                                                                    <td><a href="/tree/{{$supervisor[0]['id']}}&{{$supervisor[1]['id']}}&{{$supervisor[2]['id']}}&{{$worker->id}}&6">{{$worker->name}}</a></td>
                                                                     <td>{{$worker->position}}</td>
                                                                     <td>{{$worker->hired_at}}</td>
                                                                     <td>{{$worker->salary}}</td>
@@ -130,7 +130,7 @@
                                                             @if($workers)
                                                             <li class="list-group-item">
                                                                 <ul class="list-group">
-                                                                    <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[3][0]->name}} | Workers</p>
+                                                                    <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[3]['name']}} | Workers</p>
                                                                     <table class="table table-hover">
                                                                         <thead>
                                                                             <tr>

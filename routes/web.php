@@ -23,17 +23,24 @@ Route::get('/tree/{id}', 'TreeController@show');
 Auth::routes();
 
 //List
-Route::get('/list', 'ListController@index')->middleware('auth')->name('list');
-Route::match(['get','post'], '/list/order/{info}','ListController@order')->middleware('auth');
+Route::get('/list', 'ListController@index')->name('list');
+Route::post('/list/{info}','ListController@search');
+Route::post('/order','ListController@order');
+
 
 //CRUD
 Route::get('/home', 'HomeController@index')->name('home');
-Route::get('/home/refresh', 'HomeController@refresh')->middleware('auth');
-Route::match(['get','post'], '/home/order/{info}','HomeController@order')->middleware('auth');
-Route::get('/home/read/{id}', 'HomeController@read')->middleware('auth');
-Route::get('/home/create', 'HomeController@create')->middleware('auth');
-Route::post('/home/do_create', 'HomeController@do_create')->middleware('auth');
-Route::post('/home/accessible_supervisor', 'HomeController@accessible_supervisor_ajax')->middleware('auth');
-Route::get('/home/delete/{id}', 'HomeController@delete')->middleware('auth');
-Route::get('/home/update/{id}', 'HomeController@update')->middleware('auth')->name('update');
-Route::post('/home/do_update', 'HomeController@do_update')->middleware('auth');
+Route::post('/home','HomeController@order_ajax');
+Route::post('/home/{info}','HomeController@search');
+
+
+Route::get('/home/read/{id}', 'HomeController@read');
+
+Route::get('/home/create', 'HomeController@create');
+Route::post('/createajax', 'HomeController@accessible_supervisor_ajax');
+Route::post('/do_create', 'HomeController@do_create');
+
+Route::get('/home/delete/{id}', 'HomeController@delete');
+
+Route::get('/home/update/{id}', 'HomeController@update')->name('update');
+Route::post('/do_update', 'HomeController@do_update');
