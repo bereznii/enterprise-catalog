@@ -39,6 +39,10 @@ class HomeController extends Controller
 
     public function search(Request $request) {
 
+        $this->validate($request, [
+            'search_request' => 'alpha_num|max:200',
+        ]);
+
         if(view()->exists('home')) {
 
             $search_request = $request->input('search_request');
@@ -184,13 +188,13 @@ class HomeController extends Controller
             $worker = Worker::find($user_id);//работник, чьи данные требуется
             $supervisor = Worker::find($worker->supervisor);//данные о руководителе работника
             
-            if($worker->supervisor) {
-                if(!$supervisor) {
+            if(isset($worker->supervisor)) {
+                if($supervisor) {
                     $accessible_supervisor_position = $positionArr[array_search($worker->position, $positionArr) - 1];
+                    $supervisor_list = Worker::where('position', '=', $accessible_supervisor_position)->get();
                 } else {
-                    $accessible_supervisor_position = $positionArr[array_search($supervisor->position, $positionArr)];//название позиции руководителя
+                    $supervisor_list = NULL;
                 }
-                $supervisor_list = Worker::where('position', '=', $accessible_supervisor_position)->get();
                 
             } else if($worker->supervisor == NULL) {
                 $accessible_supervisor_position = $positionArr[array_search($worker->position, $positionArr) - 1];
@@ -211,29 +215,40 @@ class HomeController extends Controller
 
     public function do_update(Request $request) {
 
+        $this->validate($request, [
+            'new_name' => 'required|regex:/^[\pL\s\-]+$/u|max:200',
+            'new_salary' => 'digits_between:1,10',
+        ]);
+
         if(view()->exists('userupdate')) {
 
             $worker = $request->all();
 
-            if($worker['new_supervisor'] == 'NULL') {
+            if(!isset($worker['new_supervisor'])) {
                 $worker['new_supervisor'] = 0;
             }
 
-            $name = $request->file('new_photo')->getClientOriginalName();
+            if($request->file('new_photo')) {
+                $name = $request->file('new_photo')->getClientOriginalName();
 
-            $photo_name = explode('.', $request->file('new_photo')->getClientOriginalName());
-            $photo_name = $worker['user_id'] . '.' . $photo_name[1];
+                $photo_name = explode('.', $request->file('new_photo')->getClientOriginalName());
+                $photo_name = $worker['user_id'] . '.' . $photo_name[1];
+                $request->file('new_photo')->storeAs('public', $photo_name);
+            } else {
+                $photo_name = NULL;
+            }
             
             $updated_worker = Worker::find($worker['user_id']);
             $updated_worker->name = $worker['new_name'];
             $updated_worker->position = $worker['new_position'];
             $updated_worker->supervisor = $worker['new_supervisor'];
             $updated_worker->salary = $worker['new_salary'];
-            $updated_worker->photo = $photo_name;
+            if($photo_name) {
+                $updated_worker->photo = $photo_name;
+                $request->file('new_photo')->storeAs('public', $photo_name);
+            }
             $updated_worker->hired_at = $worker['new_date'];
             $updated_worker->save();
-
-            $request->file('new_photo')->storeAs('public', $photo_name);
 
             return redirect()->action('HomeController@read', ['user_id' => $worker['user_id']]);
             
@@ -263,25 +278,37 @@ class HomeController extends Controller
 
     public function do_create(Request $request) {
 
+        $this->validate($request, [
+            'name' => 'required|regex:/^[\pL\s\-]+$/u|max:200',
+            'salary' => 'digits_between:1,10',
+        ]);
+
         if(view()->exists('userinfo')) {
 
-            $new_worker = $request->all();
-            if($request->file('new_photo')) {
-                $name = $request->file('new_photo')->getClientOriginalName();
+            $last_worker = Worker::orderBy('id','desc')->limit(1)->get();
+            $id = $last_worker[0]['id'] + 1;
 
-                $photo_name = explode('.', $request->file('new_photo')->getClientOriginalName());
+            $new_worker = $request->all();
+            
+            if($request->file('photo')) {
+                $name = $request->file('photo')->getClientOriginalName();
+
+                $photo_name = explode('.', $request->file('photo')->getClientOriginalName());
                 $photo_name = $id . '.' . $photo_name[1];
-                $request->file('new_photo')->storeAs('public', $photo_name);
+                $request->file('photo')->storeAs('public', $photo_name);
             } else {
                 $photo_name = NULL;
             }
+            if(!isset($new_worker['supervisor'])) {
+                $new_worker['supervisor'] = 0;
+            }
 
             $worker = new Worker;
-            $worker->name = $new_worker['new_name'];
-            $worker->position = $new_worker['new_position'];
-            $worker->supervisor = $new_worker['new_supervisor'];
-            $worker->hired_at = $new_worker['new_date'];
-            $worker->salary = $new_worker['new_salary'];
+            $worker->name = $new_worker['name'];
+            $worker->position = $new_worker['position'];
+            $worker->supervisor = $new_worker['supervisor'];
+            $worker->hired_at = $new_worker['date'];
+            $worker->salary = $new_worker['salary'];
             $worker->photo = $photo_name;
             $worker->save();
 

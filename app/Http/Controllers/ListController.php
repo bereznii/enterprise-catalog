@@ -26,6 +26,10 @@ class ListController extends Controller
 
     public function search(Request $request) {
 
+        $this->validate($request, [
+            'search_request' => 'alpha_num|max:200',
+        ]);
+
         if(view()->exists('list')) {
 
             $search_request = $request->input('search_request');

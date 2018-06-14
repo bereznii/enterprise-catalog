@@ -26,6 +26,9 @@
         .navbar {
             margin-bottom: 0;
         }
+        .alert {
+            margin-bottom: 0;
+        }
     </style>
 </head>
 <body>
@@ -61,7 +64,7 @@
                             <li><a href="{{ route('login') }}">Войти</a></li>
                             <li><a href="{{ route('register') }}">Зарегистрироваться</a></li>
                             <li><a href="{{ url('/') }}">На главную</a></li>
-                            <li><a href="{{ url('/tree/none') }}">Дерево Сотрудников</a></li>
+                            <li><a href="{{ url('/tree') }}">Дерево Сотрудников</a></li>
                             <li><a href="{{ route('list') }}">Список Сотрудников</a></li>
                         @else
                             <li class="dropdown">
@@ -83,7 +86,7 @@
                                     </li>
                                     <li><a href="{{ url('/') }}">На Главную</a></li>
                                     <li><a href="{{ url('/home') }}">Кабинет</a></li>
-                                    <li><a href="{{ url('/tree/none') }}">Дерево Сотрудников</a></li>
+                                    <li><a href="{{ url('/tree') }}">Дерево Сотрудников</a></li>
                                     <li><a href="{{ route('list') }}">Список Сотрудников</a></li>
                                 </ul>
                             </li>

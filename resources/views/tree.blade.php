@@ -1,171 +1,36 @@
 @extends('layouts.app')
+<script
+  src="https://code.jquery.com/jquery-3.3.1.js"
+  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+  crossorigin="anonymous"></script>
 @section('content')
-        <ul class="list-group">
-            <p class="list-group-item list-group-item-info">President</p>
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ФИО</th>
-                                <th>Должность</th>
-                                <th>Дата​ ​приема​ ​на​ ​работу</th>
-                                <th>Размер​ ​заработной​ ​платы</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($president as $head)
-                            <tr>
-                                <td>{{$head['id']}}</td>
-                                <td>{{$head->name}}</td>
-                                <td>{{$head->position}}</td>
-                                <td>{{$head->hired_at}}</td>
-                                <td>{{$head->salary}}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-            <li class="list-group-item">
-                <ul class="list-group">
-                    <p class="list-group-item list-group-item-info">Second Management Level</p>
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>ФИО</th>
-                                <th>Должность</th>
-                                <th>Дата​ ​приема​ ​на​ ​работу</th>
-                                <th>Размер​ ​заработной​ ​платы</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        @foreach($secondworkers as $worker)
-                            <tr>
-                                <td>{{$worker->id}}</td>
-                                <td><a href="/tree/{{$worker->id}}&3">{{$worker->name}}</td>
-                                <td>{{$worker->position}}</td>
-                                <td>{{$worker->hired_at}}</td>
-                                <td>{{$worker->salary}}</td>
-                            </tr>
-                        @endforeach
-                        </tbody>
-                    </table>
-                    @if($thirdworkers)
-                        <li class="list-group-item">
-                            <ul class="list-group">
-                                <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[0]['name']}} | Third Management Level</p>
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>ФИО</th>
-                                            <th>Должность</th>
-                                            <th>Дата​ ​приема​ ​на​ ​работу</th>
-                                            <th>Размер​ ​заработной​ ​платы</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach($thirdworkers as $worker)
-                                        <tr>
-                                            <td>{{$worker->id}}</td>
-                                            <td><a href="/tree/{{$supervisor[0]['id']}}&{{$worker->id}}&4">{{$worker->name}}</a></td>
-                                            <td>{{$worker->position}}</td>
-                                            <td>{{$worker->hired_at}}</td>
-                                            <td>{{$worker->salary}}</td>
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
-                                    @if($fourthworkers)
-                                    <li class="list-group-item">
-                                        <ul class="list-group">
-                                            <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[1]['name']}} | Fourth Management Level</p>
-                                            <table class="table table-hover">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>ФИО</th>
-                                                        <th>Должность</th>
-                                                        <th>Дата​ ​приема​ ​на​ ​работу</th>
-                                                        <th>Размер​ ​заработной​ ​платы</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                @foreach($fourthworkers as $worker)
-                                                    <tr>
-                                                        <td>{{$worker->id}}</td>
-                                                        <td><a href="/tree/{{$supervisor[0]['id']}}&{{$supervisor[1]['id']}}&{{$worker->id}}&5">{{$worker->name}}</a></td>
-                                                        <td>{{$worker->position}}</td>
-                                                        <td>{{$worker->hired_at}}</td>
-                                                        <td>{{$worker->salary}}</td>
-                                                    </tr>
-                                                @endforeach
-                                                </tbody>
-                                            </table>
-                                                @if($fifthworkers)
-                                                <li class="list-group-item">
-                                                    <ul class="list-group">
-                                                        <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[2]['name']}} | Fifth Management Level</p>
-                                                        <table class="table table-hover">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>#</th>
-                                                                    <th>ФИО</th>
-                                                                    <th>Должность</th>
-                                                                    <th>Дата​ ​приема​ ​на​ ​работу</th>
-                                                                    <th>Размер​ ​заработной​ ​платы</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            @foreach($fifthworkers as $worker)
-                                                                <tr>
-                                                                    <td>{{$worker->id}}</td>
-                                                                    <td><a href="/tree/{{$supervisor[0]['id']}}&{{$supervisor[1]['id']}}&{{$supervisor[2]['id']}}&{{$worker->id}}&6">{{$worker->name}}</a></td>
-                                                                    <td>{{$worker->position}}</td>
-                                                                    <td>{{$worker->hired_at}}</td>
-                                                                    <td>{{$worker->salary}}</td>
-                                                                </tr>
-                                                            @endforeach
-                                                            </tbody>
-                                                        </table>
-                                                            @if($workers)
-                                                            <li class="list-group-item">
-                                                                <ul class="list-group">
-                                                                    <p class="list-group-item list-group-item-info">Руководитель: {{$supervisor[3]['name']}} | Workers</p>
-                                                                    <table class="table table-hover">
-                                                                        <thead>
-                                                                            <tr>
-                                                                                <th>#</th>
-                                                                                <th>ФИО</th>
-                                                                                <th>Должность</th>
-                                                                                <th>Дата​ ​приема​ ​на​ ​работу</th>
-                                                                                <th>Размер​ ​заработной​ ​платы</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                        @foreach($workers as $worker)
-                                                                            <tr>
-                                                                                <td>{{$worker->id}}</td>
-                                                                                <td>{{$worker->name}}</td>
-                                                                                <td>{{$worker->position}}</td>
-                                                                                <td>{{$worker->hired_at}}</td>
-                                                                                <td>{{$worker->salary}}</td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                                        </tbody>
-                                                                    </table>
-                                                                </ul>
-                                                            </li>
-                                                            @endif
-                                                    </ul>
-                                                </li>
-                                                @endif
-                                        </ul>
-                                    </li>
-                                    @endif
-                            </ul>
-                        </li>
-                        @endif
-                </ul>
-            </li>
-        </ul>
+
+    <ul class="list-group">
+        <li class="list-group-item item{{$president->id}}"><p class="some" id="{{$president->id}}" style="cursor: pointer;"><span class="glyphicon glyphicon-menu-right" id="item{{$president->id}}"></span>   {{$president->name}} | {{$president->position}}</p>
+            <div class="{{$president->id}}">
+            </div>
+        </li>
+    </ul>
+
+</body>
+<script>
+    $(document).ready(function() {
+        $(document).on('click', '.some', function() {
+            var id = $(this).attr("id");
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                url:"/treeajax",
+                method:"POST",
+                data:{id:id},
+                success: function(data) {
+                    $('.'+id+'').html(data);
+                    $('.item'+id+'').addClass('list-group-item-info');
+                    $('#item'+id+'').toggleClass('glyphicon-menu-right').addClass('glyphicon-menu-down');
+                }
+            })
+        });
+    });
+</script>
 @endsection

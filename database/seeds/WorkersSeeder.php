@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Worker;
 
 class WorkersSeeder extends Seeder
 {
@@ -49,7 +50,14 @@ class WorkersSeeder extends Seeder
                 $supervisor = random_int(87, 686);
             }
             
-            DB::insert("INSERT INTO workers (name, position, salary, supervisor) VALUES (?, ?, ?, ?)", [$name, $position, $salary, $supervisor]);
+            $worker = new Worker;
+            $worker->name = $name;
+            $worker->position = $position;
+            $worker->salary = $salary;
+            $worker->supervisor = $supervisor;
+            $worker->hired_at = date("Y-m-d");
+            $worker->save();
+            
         }
     }
 }

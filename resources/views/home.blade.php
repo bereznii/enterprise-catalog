@@ -1,8 +1,17 @@
 @extends('layouts.app')
 @section('content')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
         <div class="panel panel-default" >
         <div class="panel-heading">
-        <form action="/home/none" method="post">
+        <form action="/home" method="post">
             {{ csrf_field() }}
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Search" value='' name="search_request">
@@ -70,7 +79,7 @@
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        url:"/home",
+                        url:"/homeorder",
                         method:"POST",
                         data:{column_name:column_name, order:order},
                         success: function(data) {

@@ -25,7 +25,7 @@
                         </tr>
                         <tr>
                             <td>ФИО</td>
-                            <td><input class="form-control" type="text" placeholder="" value="{{$worker->name}}" name="new_name" required></td>
+                            <td><input class="form-control" type="text" placeholder="{{$worker->name}}" value="{{$worker->name}}" name="new_name" maxlength="254" required></td>
                         </tr>
                         <tr>
                             <td>Должность</td>
@@ -45,6 +45,7 @@
                             <td>Руководитель</td>
                             <td>
                                 <select class="form-control" name="new_supervisor" id="sel2">
+                                    @if(isset($supervisor_list))
                                     @foreach($supervisor_list as $supervisor)
                                          @if($supervisor->id == $worker->supervisor)
                                             <option selected="selected" value="{{$supervisor->id}}">{{$supervisor->name}}, {{$supervisor->id}}, {{$supervisor->position}}</option>
@@ -52,17 +53,18 @@
                                             <option value="{{$supervisor->id}}">{{$supervisor->name}}, {{$supervisor->id}}, {{$supervisor->position}}</option>
                                         @endif
                                     @endforeach
+                                    @endif
                                 </select>
                                 
                             </td>
                         </tr>
                         <tr>
                             <td>Дата приема на работу</td>
-                            <td><input class="form-control" type="date" value="{{$worker->hired_at}}" name="new_date"></td>
+                            <td><input class="form-control" type="date" value="{{$worker->hired_at}}" name="new_date" required></td>
                         </tr>
                         <tr>
                             <td>Размер заработной платы</td>
-                            <td><input class="form-control" type="text" placeholder="" value="{{$worker->salary}}" name="new_salary" required></td>
+                            <td><input class="form-control" type="text" placeholder="" value="{{$worker->salary}}" name="new_salary" maxlength="10" required></td>
                         </tr>
                         <tr>
                             <td>Фотография сотрудника</td>

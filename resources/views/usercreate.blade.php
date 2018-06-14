@@ -1,6 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
         <div class="main-section">
             <div class="panel panel-info" >
                 <div class="panel-heading">
@@ -24,12 +33,12 @@
                         </tr>
                         <tr>
                             <td>ФИО</td>
-                            <td><input class="form-control" type="text" name="new_name" required></td>
+                            <td><input class="form-control" type="text" name="name" placeholder="Фамилия Имя Отчество" maxlength="254" value="{{ old('name') }}" required></td>
                         </tr>
                         <tr>
                             <td>Должность</td>
                             <td>
-                                <select class="form-control"  name="new_position" id="sel1">
+                                <select class="form-control"  name="position" id="sel1">
                                     @foreach($positions as $position)
                                         <option value="{{$position}}">{{$position}}</option>
                                     @endforeach
@@ -39,21 +48,21 @@
                         <tr>
                             <td>Руководитель</td>
                             <td>
-                                <select class="form-control"  name="new_supervisor" id="sel2">
+                                <select class="form-control"  name="supervisor" id="sel2">
                                 </select>
                             </td>
                         </tr>
                         <tr>
                             <td>Дата приема на работу</td>
-                            <td><input class="form-control" type="date" value="" name="new_date"></td>
+                            <td><input class="form-control" type="date" value="{{ old('date') }}" name="date" required></td>
                         </tr>
                         <tr>
                             <td>Размер заработной платы</td>
-                            <td><input class="form-control" type="number" value="" name="new_salary" required></td>
+                            <td><input class="form-control" type="number" name="salary" value="{{ old('salary') }}" maxlength="10" required></td>
                         </tr>
                         <tr>
                             <td>Фотография сотрудника</td>
-                            <td><input type="file" class="form-control-file" name="new_photo"></td>
+                            <td><input type="file" class="form-control-file" name="photo"></td>
                         </tr>
                         <tr>
                             <td></td>
