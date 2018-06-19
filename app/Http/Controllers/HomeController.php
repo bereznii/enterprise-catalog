@@ -225,7 +225,10 @@ class HomeController extends Controller
             $worker = $request->all();
 
             if(!isset($worker['new_supervisor'])) {
-                $worker['new_supervisor'] = 0;
+                $worker['new_supervisor'] = '0';
+            }
+            if(!$worker['new_supervisor']) {
+                $worker['new_supervisor'] = '0';
             }
 
             if($request->file('new_photo')) {
@@ -337,7 +340,7 @@ class HomeController extends Controller
                 echo $response_supervisors;
 
             } else {
-                $response_supervisors .= "<option>". "-" ."</option>"; 
+                $response_supervisors .= ""; 
                 echo $response_supervisors;
             }
             

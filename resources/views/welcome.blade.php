@@ -68,7 +68,7 @@
         <div class="flex-center position-ref full-height">
             
                 <div class="top-right links">
-                    <a href="{{ url('/tree/none') }}">Дерево Сотрудников</a>
+                    <a href="{{ url('/tree') }}">Дерево Сотрудников</a>
                     <a href="{{ url('/list') }}">Список Сотрудников</a>  
                 @if (Route::has('login'))
                     @if (Auth::check())

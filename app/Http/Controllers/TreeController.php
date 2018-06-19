@@ -13,9 +13,11 @@ class TreeController extends Controller
 
         if(view()->exists('tree')) {
             
-            $president = Worker::find(1);
-
-            return view('tree')->withTitle('Tree')->with('president', $president);
+            $presidents = Worker::where('supervisor','=','0')->get();
+            if(!isset($presidents[0])) {
+                $presidents = NULL;
+            }
+            return view('tree')->withTitle('Tree')->with('presidents', $presidents);
             
         }
 

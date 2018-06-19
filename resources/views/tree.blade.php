@@ -5,12 +5,22 @@
   crossorigin="anonymous"></script>
 @section('content')
 
+    
     <ul class="list-group">
+    @if(isset($presidents))
+        @foreach($presidents as $president)
         <li class="list-group-item item{{$president->id}}"><p class="some" id="{{$president->id}}" style="cursor: pointer;"><span class="glyphicon glyphicon-menu-right" id="item{{$president->id}}"></span>   {{$president->name}} | {{$president->position}}</p>
             <div class="{{$president->id}}">
             </div>
         </li>
+        @endforeach
+    @elseif(!isset($presidents))
+        <li class="list-group-item list-group-item-danger">
+            <p>Президент отсутствует. Дерево не может быть построено.</p>
+        </li>
+    @endif
     </ul>
+    
 
 </body>
 <script>
