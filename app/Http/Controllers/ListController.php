@@ -98,7 +98,7 @@ class ListController extends Controller
             
             if($worker->photo) {
                 $photo = "
-                        <a href=".asset('storage/'. $worker->photo). " data-lightbox='. $worker->photo. ' data-title='{{"."$"."worker->name}}'>
+                        <a href=".asset('storage/'. $worker->photo). " data-lightbox='" . $worker->photo."' data-title='".$worker->name."'>
                             <img src=".asset('storage/' .$worker->photo). " style='max-width:20px; max-height:20px;'>
                         </a>";
             } else {
