@@ -37,6 +37,9 @@ class HomeController extends Controller
         abort(404);
     }
 
+    /**
+     * Method for searching
+     */
     public function search(Request $request) {
 
         $this->validate($request, [
@@ -64,6 +67,9 @@ class HomeController extends Controller
         abort(404);
     }
 
+    /**
+     * Method for ordering searched list with AJAX
+     */
     public function order_ajax(Request $request) {
 
         $order = $request->input('order');
@@ -110,6 +116,7 @@ class HomeController extends Controller
                             </th>
                         </tr>
                     </thead><tbody>';
+
         foreach($workers as $worker) {
     
         $output .= '
@@ -141,7 +148,6 @@ class HomeController extends Controller
         }
         
         echo $output;
-
     
     }
 
@@ -207,7 +213,7 @@ class HomeController extends Controller
             return view('userupdate')->withTitle('Update')->with('worker', $worker)
                                                         ->with('supervisor', $supervisor)
                                                         ->with('positions', $positionArr)
-                                                        ->with('supervisor_list', $supervisor_list);
+                                                        ->with('supervisor_list', $supervisor_list);//список возможных руководителей
         }
 
         abort(404);
@@ -218,6 +224,7 @@ class HomeController extends Controller
         $this->validate($request, [
             'new_name' => 'required|regex:/^[\pL\s\-]+$/u|max:200',
             'new_salary' => 'digits_between:1,10',
+            'new_photo' => 'nullable|file|image|max:2048',
         ]);
 
         if(view()->exists('userupdate')) {
@@ -225,7 +232,7 @@ class HomeController extends Controller
             $worker = $request->all();
 
             if(!isset($worker['new_supervisor'])) {
-                $worker['new_supervisor'] = '0';
+                $worker['new_supervisor'] = '0';//работник с руководителем "0" - президент
             }
             if(!$worker['new_supervisor']) {
                 $worker['new_supervisor'] = '0';
@@ -233,9 +240,8 @@ class HomeController extends Controller
 
             if($request->file('new_photo')) {
                 $name = $request->file('new_photo')->getClientOriginalName();
-
                 $photo_name = explode('.', $request->file('new_photo')->getClientOriginalName());
-                $photo_name = $worker['user_id'] . '.' . $photo_name[1];
+                $photo_name = $worker['user_id'] .'-'. date("YmdHis") . '.' . $photo_name[1];//название фото: пользовательский-id + изначальный формат
                 $request->file('new_photo')->storeAs('public', $photo_name);
             } else {
                 $photo_name = NULL;
@@ -282,7 +288,7 @@ class HomeController extends Controller
     public function do_create(Request $request) {
 
         $this->validate($request, [
-            'name' => 'required|regex:/^[\pL\s\-]+$/u|max:200',
+            'name' => 'required|regex:/^[\pL\s\-]+$/u|max:200',//допускает пробелы
             'salary' => 'digits_between:1,10',
         ]);
 
@@ -297,7 +303,7 @@ class HomeController extends Controller
                 $name = $request->file('photo')->getClientOriginalName();
 
                 $photo_name = explode('.', $request->file('photo')->getClientOriginalName());
-                $photo_name = $id . '.' . $photo_name[1];
+                $photo_name = $id .'-'. date("YmdHis") . '.' . $photo_name[1];
                 $request->file('photo')->storeAs('public', $photo_name);
             } else {
                 $photo_name = NULL;
@@ -324,6 +330,9 @@ class HomeController extends Controller
         abort(404);
     }
 
+    /**
+     * Method for getting accessible supervisor, those who are higher by 1 management level
+     */
     public function accessible_supervisor_ajax(Request $request) {
 
             $positions = ['President', 'Second Management Level', 'Third Management Level', 'Fourth Management Level', 'Fifth Management Level', 'Worker'];
@@ -342,7 +351,6 @@ class HomeController extends Controller
             } else {
                 $response_supervisors .= ""; 
                 echo $response_supervisors;
-            }
-            
+            } 
     }
 }

@@ -16,6 +16,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//Tree
 Route::get('/tree', 'TreeController@show');
 Route::post('/treeajax', 'TreeController@showsecond');
 

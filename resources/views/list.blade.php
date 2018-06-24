@@ -44,7 +44,7 @@
                     <td>{{$worker->hired_at}}</td>
                     <td>{{$worker->salary}}</td>
                     <td>
-                        @if($worker->photo)
+                        @if($worker->photo && Storage::disk('public')->exists($worker->photo))
                         <a href="{{asset('storage/') . '/' . $worker->photo}}" data-lightbox="{{$worker->photo}}" data-title="{{$worker->name}}">
                             <img src="{{asset('storage/') . '/' . $worker->photo}}" style="max-width:20px; max-height:20px;">
                         </a>

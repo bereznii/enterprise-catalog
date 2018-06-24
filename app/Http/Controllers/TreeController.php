@@ -24,6 +24,9 @@ class TreeController extends Controller
         abort(404);
     }
 
+    /**
+     * Method for getting next management level workers
+     */
     public function showsecond(Request $request) {
 
         $workers = Worker::where('supervisor', '=', $request->input('id'))->get();

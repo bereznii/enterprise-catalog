@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use Storage;
 use DB;
 use App\Worker;
 
@@ -15,7 +16,7 @@ class ListController extends Controller
         if(view()->exists('list')) {
 
             $request->session()->forget('search_request');
-
+            
             $workers = Worker::limit(100)->get();
             
             return view('list')->withTitle('List')->with('workers', $workers);
@@ -24,6 +25,9 @@ class ListController extends Controller
         abort(404);
     }
 
+    /**
+     * Method for searching
+     */
     public function search(Request $request) {
 
         $this->validate($request, [
@@ -51,6 +55,9 @@ class ListController extends Controller
         abort(404);
     }
 
+    /**
+     * Method for ordering searched list with AJAX
+     */
     public function order(Request $request) {
 
             $order = $request->input('order');
@@ -94,9 +101,10 @@ class ListController extends Controller
                                 <th>Фото</th>
                             </tr>
                         </thead><tbody>';
+
             foreach($workers as $worker) {
             
-            if($worker->photo) {
+            if($worker->photo && Storage::disk('public')->exists($worker->photo)) {
                 $photo = "
                         <a href=".asset('storage/'. $worker->photo). " data-lightbox='" . $worker->photo."' data-title='".$worker->name."'>
                             <img src=".asset('storage/' .$worker->photo). " style='max-width:20px; max-height:20px;'>
@@ -116,7 +124,6 @@ class ListController extends Controller
                         </tr>';
             }
             
-            echo $output;
-        
+            echo $output;     
     }
 }
